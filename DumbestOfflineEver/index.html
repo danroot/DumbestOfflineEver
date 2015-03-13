@@ -1,12 +1,18 @@
 ﻿<!DOCTYPE html>
 <html manifest="cache.manifest">
 <head>
+    <!--
+    The manifest attribute above tells a device to use the given manifest file. In this case, the file
+    tells a device to cache index.html. See http://diveintohtml5.info/offline.html for more.
+
+    The meta tags and links below tell mobile devices to display the app like a native app, and specify the icons.
+    -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, user-scalable=no, maximum-scale=1, minimum-scale=1"/>
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, user-scalable=no, maximum-scale=1, minimum-scale=1" />
     <link rel="apple-touch-icon" href="touch-icon-iphone.png" />
     <link rel="apple-touch-icon" sizes="76x76" href="touch-icon-ipad.png" />
     <link rel="apple-touch-icon" sizes="120x120" href="touch-icon-iphone-retina.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad-retina.png"/>
+    <link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad-retina.png" />
 
     <title>Dumbest Offline GPS App Ever</title>
     <style type="text/css">
@@ -16,7 +22,8 @@
             margin: 5px;
             padding: 5px;
         }
-        #form button {
+
+        button {
             margin: 5px;
             padding: 5px;
         }
@@ -29,22 +36,30 @@
         <input type="text" id="lon" placeholder="Longitude" />
         <button onclick=" markWithGps(); ">Mark</button>
         <button onclick=" addItem(); ">Add</button>
-
-        <ul id="list"></ul>
     </div>
-    <script type="text/javascript">
-        var items = [];
+    <ul id="list"></ul>
+    <button onclick=" sendAll() ">Send</button>
+    <button onclick=" clearAll() ">Clear</button>
 
+    <script type="text/javascript">
+        //This app shows a very simple one-page app that uses offline and GPS.
+        //There are much better ways of doing this and making it prettier.
+
+        var items = [];
+        
         function markWithGps() {
+            //Call the geolocation api built into most newer browsers
             navigator.geolocation.getCurrentPosition(onMarkPosition);
         }
 
         function onMarkPosition(pos) {
+            //When geolocation succeeds, this method is called.
             document.getElementById('lat').value = pos.coords.latitude;
             document.getElementById('lon').value = pos.coords.longitude;
         }
 
         function addItemToList(item) {
+            //adds an item to the list.
             var list = document.getElementById('list');
             var newListItem = document.createElement('li');
             newListItem.innerText = item.title + " " + item.lat + " " + item.lon;
@@ -52,32 +67,55 @@
         }
 
         function addItem() {
-
+            //create a new object with the values from the form.
             var newItem = {
                 title: document.getElementById('title').value,
                 lat: document.getElementById('lat').value,
                 lon: document.getElementById('lon').value
             }
 
+            //add the object to the list
             addItemToList(newItem);
 
+            //add the object to the array and update local storage with all items.
             window.items.push(newItem);
             window.localStorage.setItem('dumbest.items', JSON.stringify(window.items));
 
+            //clear the form
             document.getElementById('title').value = "";
             document.getElementById('lat').value = "";
             document.getElementById('lon').value = "";
         }
 
+        function clearAll() {
+            //delete all items from the array
+            window.items = [];
+            //update localstorage with an empty array
+            window.localStorage.setItem('dumbest.items', JSON.stringify([]));
+            //empty the list
+            var list = document.getElementById('list');
+            list.innerHTML = '';
+        }
+
+        function sendAll() {
+            //construct an email link with the items as json
+            var body = JSON.stringify(window.items);
+            window.location.href = 'mailto:somebody@somewhere.com?subject=Points&body=' + body;
+
+        }
+
         function init() {
+            //get the points from localStorage, or an empty array if there are none.
             var json = window.localStorage.getItem('dumbest.items') || '[]';
             window.items = JSON.parse(json);
+            //for each one, add it to the list
             for (var i = 0; i < window.items.length; i++) {
                 var item = window.items[i];
                 addItemToList(item);
             }
         }
 
+        //call init when we first load.
         init();
     </script>
 </body>
