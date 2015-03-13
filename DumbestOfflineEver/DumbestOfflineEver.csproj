@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="cache.manifest" />
+    <None Include="Properties\PublishProfiles\dumbest.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -67,6 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="index.html" />
+    <Content Include="touch-icon-ipad-retina.png" />
+    <Content Include="touch-icon-ipad.png" />
+    <Content Include="touch-icon-iphone-retina.png" />
+    <Content Include="touch-icon-iphone.png" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
