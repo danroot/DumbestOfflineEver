@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html manifest="/cache.manifest">
+<head>
+    <title>Dumbest Offline GPS App Ever</title>
+</head>
+<body>
+    <ul id="list">
+        <li>
+            <input type="text" id="title" placeholder="Title" />
+            <input type="text" id="lat" placeholder="Latitude" />
+            <input type="text" id="lon" placeholder="Longitude" />
+            <button onclick="markWithGps();">Mark</button>
+            <button onclick="addItem();">Add</button>
+        </li>
+    </ul>
+    <script type="text/javascript">
+        var items = [];
+
+        function markWithGps() {
+            navigator.geolocation.getCurrentPosition(onMarkPosition);
+        }
+
+        function onMarkPosition(pos) {
+            document.getElementById('lat').value = pos.coords.latitude;
+            document.getElementById('lon').value = pos.coords.longitude;
+        }
+
+        function addItemToList(item) {
+            var list = document.getElementById('list');
+            var newListItem = document.createElement('li');
+            newListItem.innerText = item.title + " " + item.lat + " " + item.lon;
+            list.appendChild(newListItem);
+        }
+
+        function addItem() {
+
+            var newItem = {
+                title: document.getElementById('title').value,
+                lat: document.getElementById('lat').value,
+                lon: document.getElementById('lon').value
+            }
+
+            addItemToList(newItem);
+
+            window.items.push(newItem);
+            window.localStorage.setItem('dumbest.items', JSON.stringify(window.items));
+
+            document.getElementById('title').value = "";
+            document.getElementById('lat').value = "";
+            document.getElementById('lon').value = "";
+        }
+
+        function init() {
+            var json = window.localStorage.getItem('dumbest.items') || '[]';
+            window.items = JSON.parse(json);
+            for (var i = 0; i < window.items.length; i++) {
+                var item = window.items[i];
+                addItemToList(item);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
